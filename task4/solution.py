@@ -17,6 +17,7 @@ class NotYourTurn(Exception):
 class TicTacToeBoard(dict):
     def __init__(self):
         self.winner = ''
+        self.previous_turn = ''
         dict.__init__(self)
         self.update({
             'A1': ' ',
@@ -30,8 +31,6 @@ class TicTacToeBoard(dict):
             'C3': ' ', })
 
     def __setitem__(self, key, item):
-        x_count = len([x for x in self.values() if x == 'X'])
-        o_count = len([o for o in self.values() if o == 'O'])
         try:
             if key not in self.keys():
                 raise InvalidKey
@@ -39,9 +38,9 @@ class TicTacToeBoard(dict):
                 raise InvalidMove
             if item not in ['X', 'O']:
                 raise InvalidValue
-            if (x_count > o_count and item == 'X' or
-                    x_count < o_count and item == 'O'):
+            if [item, self.previous_turn] in [['X', 'X'], ['O', 'O']]:
                 raise NotYourTurn
+            self.previous_turn = item
             super(TicTacToeBoard, self).__setitem__(key, item)
         except InvalidKey:
             raise InvalidKey
@@ -79,14 +78,13 @@ class TicTacToeBoard(dict):
                        [self['A2'], self['B2'], self['C2']],
                        [self['A3'], self['B3'], self['C3']],
                        [self['A1'], self['B2'], self['C3']],
-                       [self['A3'], self['B2'], self['C1']]]
-        X_or_O = ''
-        for element in winner_list:
-            if element == ['X', 'X', 'X']:
-                X_or_O = 'X'
-            elif element == ['O', 'O', 'O']:
-                X_or_O = 'O'
-        if X_or_O:
+                       [self['A3'], self['B2'], self['C1']]
+                       ]
+        X_or_O_list = [x[0] for x in winner_list if x in [['X', 'X', 'X'],
+                                                          ['O', 'O', 'O']]
+                       ]
+        if X_or_O_list:
+            X_or_O = X_or_O_list[0]
             self.winner = X_or_O + ' wins!'
             return (X_or_O + ' wins!')
         else:
