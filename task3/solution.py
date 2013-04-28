@@ -37,4 +37,6 @@ class Person:
 
     def is_direct_successor(self, person):
         if person in self.children_list:
-            return person
+            return True
+        else:
+            return False
